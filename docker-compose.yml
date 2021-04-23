@@ -1,0 +1,41 @@
+version: '3.9'
+services:
+  db-origin:
+    image: postgres:12.5
+    ports:
+      - "5432:5432"
+    networks:
+      - db-net
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=admin
+    volumes:
+        - ./postgresql.conf:/etc/postgresql/postgresql.conf
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+
+  db-intermediate:
+    image: postgres:12.5
+    ports:
+      - "5433:5432"
+    networks:
+      - db-net
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=admin
+    volumes:
+        - ./postgresql-repl.conf:/etc/postgresql/postgresql.conf
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+
+  db-destination:
+    image: postgres:12.5
+    ports:
+      - "6002:5432"
+    networks:
+      - db-net
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=admin
+
+networks:
+  db-net:
+    driver: bridge
